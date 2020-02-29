@@ -11,6 +11,29 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', 'WelcomeController@index');
+Auth::routes();
+
+Route::group(['middleware'=>'auth'],function (){
+
+
+    Route::get('/home', 'HomeController@index')->name('home');
+    Route::resource('/categories', 'CategoriesController');
+    Route::resource('/tags', 'TagsController');
+    Route::resource('/posts', 'PostsController');
+    //Route::resource('/users', 'UsersController');
+    Route::get('/trashed-posts', 'PostsController@trashed')->name('trashed.index');
+    Route::get('/trashed-posts/{id}', 'PostsController@restore')->name('trashed.restore');
+});
+Route::middleware(['auth','admin'])->group(function (){
+    Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+   Route::get('/users','UsersController@index')->name('users.index') ;
+   Route::post('/users/{user}/make-admin','UsersController@makeadmin')->name('users.make-admin') ;
+
+});
+Route::middleware(['auth'])->group(function (){
+    //Route::get('/users','UsersController@index')->name('users.index') ;
+    Route::get('/users/{user}/profile','UsersController@edit')->name('users.edit') ;
+    Route::post('/users/{user}/profile','UsersController@update')->name('users.update') ;
+
 });
